@@ -65,7 +65,8 @@ def fromNaturalUnits(x, output_unit, verbose=False):
                 print("WARNING: converting astropy unit to quantity by multiplying by 1.0")
             x *= 1.0
         else:
-            raise Exception("ERROR: x must be either an astropy quantity or unit")
+            print("WARNING: converting ordinary scalar to an astropy dimensionless quantity")
+            x *= u.dimensionless_unscaled
     assert isinstance(output_unit, u.UnitBase), "ERROR: output_unit must be a astropy unit"
     
     natunit = x.unit.decompose()
@@ -101,11 +102,15 @@ def fromNaturalUnits(x, output_unit, verbose=False):
         if check_units:
             # make sure that dim(x)==(energy)**E_dim
             # if not, then the specified output unit is not compatible
-            assert set(natbases)==set([u.kg, u.m, u.s]), "ERROR: natural units must be (energy)**n"
-            kg_power = natpowers[natbases.index(u.kg)]
-            m_power = natpowers[natbases.index(u.m)]
-            s_power = natpowers[natbases.index(u.s)]
-            assert kg_power==E_dim and m_power==2.0*E_dim and s_power==-2.0*E_dim, "ERROR: specified output_unit is not compatible with with energy dimension "+str(kg_power)
+            if set(natbases)==set([]):
+                # natunit is dimensionless
+                assert E_dim==0.0, "ERROR: specified output_unit is not compatible with energy dimension 0"
+            else:
+                assert set(natbases)==set([u.kg, u.m, u.s]), "ERROR: natural units must be (energy)**n"
+                kg_power = natpowers[natbases.index(u.kg)]
+                m_power = natpowers[natbases.index(u.m)]
+                s_power = natpowers[natbases.index(u.s)]
+                assert kg_power==E_dim and m_power==2.0*E_dim and s_power==-2.0*E_dim, "ERROR: specified output_unit is not compatible with with energy dimension "+str(kg_power)
 
         return (x*hbar**hbar_dim*c**c_dim).to(output_unit)
     else:
