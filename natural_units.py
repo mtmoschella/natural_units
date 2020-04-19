@@ -62,6 +62,8 @@ def toNaturalUnits(x, output_unit=u.eV, verbose=False):
 
 def fromNaturalUnits(x, output_unit, verbose=False):
     # x is an astropy quantity or unit with units of (energy)**n
+    # NEW: x can be naturally compatible with units of (energy)**n
+    #      i.e. this function automatically calls toNaturalUnits(x)
     # output_unit must be compatible or will raise an error
 
     if not isinstance(x, u.Quantity):
@@ -73,6 +75,8 @@ def fromNaturalUnits(x, output_unit, verbose=False):
             print("WARNING: converting ordinary scalar to an astropy dimensionless quantity")
             x *= u.dimensionless_unscaled
     assert isinstance(output_unit, u.UnitBase), "ERROR: output_unit must be a astropy unit"
+
+    x = toNaturalUnits(x) # outputs in eV**n by default
     
     natunit = x.unit.decompose()
     natbases = natunit.bases
