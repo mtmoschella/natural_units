@@ -1,19 +1,31 @@
+"""
+A simple natural units conversion package.
+
+This module is used for converting (astropy) units from physical units
+to natural units where $\hbar=c=1$, with the convention that the unique
+remaining 'natural' dimension is energy (eV by default).
+This module also contains useful constants in physical astropy units,
+specifically: mpl, c, habar, G, eps0
+"""
 import numpy as np
 import astropy.units as u
 from astropy.constants import c, hbar, G, eps0
 
 mpl = np.sqrt(hbar*c/G) # astropy quantity
 
-"""
-Simple natural units conversion package.
-"""
 
 def toNaturalUnits(x, output_unit=u.eV, verbose=False):
-    # x must be an astropy quantity or unit
-    # NOTE: a quantity may be an array of values, but x cannot be a list of quantities
-    #       i.e. [1., 2.0]*u.cm (ALLOWED) but [1.0*u.cm, 2.0*u.cm] (NOT ALLOWED)
-    # output_unit must be of type energy
-    # returns an astropy quantity in units of energy**n (n is selected appropriately)
+    """
+    Returns the given physical astropy Quantity in the natural units specified by output_unit.
+
+    x: an astropy Quantity or Unit
+       <x> may be an array of values, but <x> cannot be a list of quantities
+       i.e. [1., 2.0]*u.cm (ALLOWED) but [1.0*u.cm, 2.0*u.cm] (NOT ALLOWED)
+
+    output_unit: an astropy UnitBase of physical_type 'energy'
+
+    verbose: (optional) boolean, run in verbose mode
+    """
     if not isinstance(x, u.Quantity):
         if isinstance(x, u.UnitBase):
             if verbose:
@@ -61,10 +73,14 @@ def toNaturalUnits(x, output_unit=u.eV, verbose=False):
     return 1.0
 
 def fromNaturalUnits(x, output_unit, verbose=False):
-    # x is an astropy quantity or unit with units of (energy)**n
-    # NEW: x can be naturally compatible with units of (energy)**n
-    #      i.e. this function automatically calls toNaturalUnits(x)
-    # output_unit must be compatible or will raise an error
+    """
+    Returns the given (natural or physical) astropy Quantity in the physical units specified by output_unit
+
+    x: an astropy Quantity or Unit
+
+    output_unit: an astropy UnitBase
+                 must be naturally compatible with <x> or will raise AssertionError
+    """
 
     if not isinstance(x, u.Quantity):
         if isinstance(x, u.UnitBase):
