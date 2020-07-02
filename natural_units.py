@@ -146,6 +146,11 @@ def fromNaturalUnits(x, output_unit, verbose=False):
     else:
         raise Exception("ERROR: can only convert to natural units if MKS+A quantity")
         
+def convert(x, unit, verbose=False):
+    """
+    convenient alias for fromNaturalUnits
+    """
+    return fromNaturalUnits(x, unit, verbose)
 
 if __name__=='__main__':
     # use for testing
