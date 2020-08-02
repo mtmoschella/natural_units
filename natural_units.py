@@ -72,7 +72,7 @@ def toNaturalUnits(x, output_unit=u.eV, verbose=False):
         raise Exception("ERROR: can only convert to natural units if MKS+A quantity")
     return 1.0
 
-def fromNaturalUnits(x, output_unit, verbose=False):
+def fromNaturalUnits(x, output_unit, value=False, verbose=False):
     """
     Returns the given (natural or physical) astropy Quantity in the physical units specified by output_unit
 
@@ -80,6 +80,8 @@ def fromNaturalUnits(x, output_unit, verbose=False):
 
     output_unit: an astropy UnitBase
                  must be naturally compatible with <x> or will raise AssertionError
+
+    value: a boolean, if true, returns the output of astropy.to_value, otherwise return a astropy Quantity
     """
 
     if not isinstance(x, u.Quantity):
@@ -142,15 +144,19 @@ def fromNaturalUnits(x, output_unit, verbose=False):
                 s_power = natpowers[natbases.index(u.s)]
                 assert kg_power==E_dim and m_power==2.0*E_dim and s_power==-2.0*E_dim, "ERROR: specified output_unit is not compatible with with energy dimension "+str(kg_power)
 
-        return (x*hbar**hbar_dim*c**c_dim*eps0**eps0_dim).to(output_unit)
+        output = (x*hbar**hbar_dim*c**c_dim*eps0**eps0_dim).to(output_unit)
+        if value:
+            return output.to_value(output_unit)
+        else:
+            return output
     else:
         raise Exception("ERROR: can only convert to natural units if MKS+A quantity")
         
-def convert(x, unit, verbose=False):
+def convert(x, unit, value=False, verbose=False):
     """
     convenient alias for fromNaturalUnits
     """
-    return fromNaturalUnits(x, unit, verbose)
+    return fromNaturalUnits(x, unit, value, verbose)
 
 if __name__=='__main__':
     # use for testing
